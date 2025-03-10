@@ -1,10 +1,14 @@
+import os
 import gspread
 from google.oauth2.service_account import Credentials
 
 SCOPE = ["https://www.googleapis.com/auth/spreadsheets"]
 SHEET_ID = "13mCs-Vwv4EbT2ANuykpIL2_hr1ZghabkWSEmEkwc0cw"
 
-CREDENTIALS = Credentials.from_service_account_file("credentials.json", scopes = SCOPE)
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+CREDENTIAL_FILE = os.path.join(CURRENT_DIR, "credentials.json")
+
+CREDENTIALS = Credentials.from_service_account_file(CREDENTIAL_FILE, scopes = SCOPE)
 CLIENT = gspread.authorize(CREDENTIALS)
 WORKBOOK = CLIENT.open_by_key(SHEET_ID)
 
