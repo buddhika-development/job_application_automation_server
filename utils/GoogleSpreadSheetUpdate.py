@@ -12,7 +12,7 @@ worksheet_list = map(lambda x: x.title, WORKBOOK.worksheets())
 worksheet_name = "applicant_details"
  
 # check worksheet already exists or not
-def check_worksheet_existance() :
+def check_worksheet_existance() -> object :
     if worksheet_name in worksheet_list :
         # access the sheet need to update
         sheet = WORKBOOK.worksheet(worksheet_name)
@@ -24,13 +24,14 @@ def check_worksheet_existance() :
 
 
 # update google sheet with the applicant details
-def update_google_spread_sheet(name, mail, contact, education, qualification, experience):
+def update_google_spread_sheet(name:str, mail:str, contact:str, education:str, qualification:str, experience:str) -> bool:
     sheet = check_worksheet_existance()
 
     all_values = sheet.get_all_values()
     row_count = len(all_values)
     next_row = int(row_count) + 1
 
+    # Write data in the google spreadsheet
     try :
         sheet.update_cell( next_row,1, name )
         sheet.update_cell( next_row,2, mail )
@@ -43,18 +44,3 @@ def update_google_spread_sheet(name, mail, contact, education, qualification, ex
     except: 
         print("Something went wrong")
         return False
-
-
-write_applicant_details_status = update_google_spread_sheet(
-    "Chandima Sandamali",
-    "chandima@gmail.com",
-    "0702276557",
-    "Undergraduate in Ruhuna university",
-    "Working in larg scale project and working close with devops",
-    "Large scale ERP system"
-)
-
-if write_applicant_details_status :
-    print("Successfully")
-else :
-    print("Something went wrong")
