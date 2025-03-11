@@ -1,40 +1,34 @@
 from flask import Flask, request, jsonify
 from utils.GoogleSpreadSheetUpdate import update_google_spread_sheet
+from werkzeug.utils import secure_filename
+import os
 
 app = Flask(__name__)
-
+app.config['SECRET_KEY'] = 'job_automation_secret'
+app.config['UPLOAD_FOLDER'] = 'cv-container'
 
 @app.route('/api/cv-process', methods = ['POST'])
 def cv_process() :
+    
+    try:
+        applicant_name = request.form.get('applicant_name')
+        applicant_email = request.form.get('applicant_email')
+        applicant_contact = request.form.get('applicant_contact')
+        applicant_cv = request.files.get('pdf_file')
 
-    try :
-        applicant_name = request.form.get('applicant-name')
-        applicant_email = request.form.get('applicant-email')
-        apllicant_contact = request.form.get('applicant-contact')
-        applicant_education = request.form.get('applicant-education')
-        applicant_qualification = request.form.get('applicant-qualification')
-        applicant_projects = request.form.get('applicant-projects')
 
-        # update details in google spreadsheet
-        try :
-            google_sheet_data_update_status = update_google_spread_sheet(applicant_name, applicant_email, apllicant_contact, applicant_education, applicant_qualification, applicant_projects)
+        # save file in the specific file directory
+        applicant_cv.save(os.path.join(os.path.abspath(os.path.dirname(__file__)),app.config['UPLOAD_FOLDER'],secure_filename(applicant_cv.filename)))
 
-            if google_sheet_data_update_status == False :
-                return jsonify({
-                    'message' : 'Something went wrong in data insertion process'
-                })
-                
-        except Exception as e :
-            print(f"Something went wrong in google sheet data insersion {str(e)}")
-        
+        print(applicant_name,applicant_email, applicant_contact, applicant_cv)
         return jsonify({
-            'message' : 'success message'
+            'message' : 'success'
         })
-
-    except Exception as e :
-        print(f"something went wrong {str(e)}")
+        
+    except Exception as e:
+        print(f"Something went wrong in form handling.. {e}")
         return jsonify({
-            'message' : 'went wrong'
+            'message' : 'Something wrnt wrong'
         })
     
 
