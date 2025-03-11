@@ -3,9 +3,9 @@ from langchain_chroma import Chroma
 import google.generativeai as genai
 import json
 import re
+import os
 
-GEMINI_API_KEY="AIzaSyDfv9usD4XN39tIYsY6zBwLl0bGfASW6lg"
-
+os.getenv('GEMINI_API_KEY')
 #  get relevance contents
 def get_relevance_content(query) :
     context = ""
