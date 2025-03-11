@@ -7,6 +7,7 @@ import shutil
 
 from data_embedding import load_extract_cv_data
 from cv_data_extraction import process_cv
+# from utils.utils import remove_cvs, cv_storing_process
 
 load_dotenv()
 
@@ -59,11 +60,9 @@ def cv_process() :
         # extract and embeding cv data
         load_extract_cv_data(file_path)
         data = process_cv()
-
         
         # remove cvs from cv container
         remove_cvs()
-
 
         # update applicant details in google spreadsheet
         applicant_name = data.get('name')
@@ -73,17 +72,22 @@ def cv_process() :
         applicant_qualification = data.get('qualification')
         applicant_project = data.get('project')
 
-        update_google_spread_sheet(applicant_name, applicant_email, applicant_contact, applicant_education, applicant_qualification, applicant_project)
+        # store applicant details in google spreadsheet
+        try :
+            update_google_spread_sheet(applicant_name, applicant_email, applicant_contact, applicant_education, applicant_qualification, applicant_project)
 
-        if update_google_spread_sheet:
-            return jsonify({
-                'message' : 'Success'
-            })
-        else :
-            return jsonify({
-                'message' : 'Something wrong'
-            })
+            if update_google_spread_sheet:
+                return jsonify({
+                    'message' : 'Success'
+                })
+            else :
+                return jsonify({
+                    'message' : 'Something wrong'
+                })
+        except Exception as e:
+            print(f"Something went wrong in data storing in spreadsheet... {e}")
         
+
     except Exception as e:
         print(f"Something went wrong in form handling.. {e}")
         return jsonify({
