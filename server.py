@@ -1,10 +1,14 @@
 from flask import Flask, request, jsonify
 from utils.GoogleSpreadSheetUpdate import update_google_spread_sheet
 from werkzeug.utils import secure_filename
+from dotenv import load_dotenv
 import os
 
+
+load_dotenv()
+
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'job_automation_secret'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.config['UPLOAD_FOLDER'] = 'cv-container'
 
 @app.route('/api/cv-process', methods = ['POST'])
@@ -15,7 +19,6 @@ def cv_process() :
         applicant_email = request.form.get('applicant_email')
         applicant_contact = request.form.get('applicant_contact')
         applicant_cv = request.files.get('pdf_file')
-
 
         # save file in the specific file directory
         applicant_cv.save(os.path.join(os.path.abspath(os.path.dirname(__file__)),app.config['UPLOAD_FOLDER'],secure_filename(applicant_cv.filename)))
