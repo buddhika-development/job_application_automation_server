@@ -4,6 +4,7 @@ from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 import os
 import shutil
+import boto3
 
 from data_embedding import load_extract_cv_data
 from cv_data_extraction import process_cv
@@ -15,6 +16,35 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.config['UPLOAD_FOLDER'] = 'cv-container'
 
+# send cv files to s3 instance
+def put_cv_cloud(data_path, name):
+
+    # create propper name for store in aws s3 bucket
+    file_name = name.replace(" ", "")
+
+    # store data in bucket
+    try:
+        print(data_path)
+        s3_client = boto3.client(
+            's3',
+             aws_access_key_id = os.getenv('AWS_ACCESS_KEY'),
+             aws_secret_access_key = os.getenv('AWS_SECRET_KEY')
+        )
+
+        with open(data_path):
+            s3_client.put_object(
+                Body = data_path,
+                Bucket = 'cv-container',
+                Key = f'applicant-cv/{file_name}.pdf',
+                ContentType='application/pdf'
+            )
+        return True
+    
+    except Exception as e:
+        print(f"Something happening in data cloud storing process ... {e}")
+        return False
+    
+
 
 # remove cvs in cv-container
 def remove_cvs():
@@ -24,8 +54,7 @@ def remove_cvs():
             shutil.rmtree(cv_container_path)
         except Exception as e:
             print(f"Something went wronf cv container clearing process.. {e}")
-    else:
-        print('path isnt exists')
+
 
 
 # cv container and stote cv in container
@@ -56,6 +85,18 @@ def cv_process() :
 
         # store cv in container
         file_path = cv_storing_process(applicant_cv)
+
+        # upload cvs into gloud storage
+        try:
+            cloud_upload = put_cv_cloud(file_path,name)
+
+            if cloud_upload:
+                print("sucessully uploaded")
+            else :
+                print("didnt upload")
+            
+        except Exception as e:
+            print(f"Something went wrong while data uploading into cloud... {e}")
 
         # extract and embeding cv data
         load_extract_cv_data(file_path)
@@ -91,7 +132,7 @@ def cv_process() :
     except Exception as e:
         print(f"Something went wrong in form handling.. {e}")
         return jsonify({
-            'message' : 'Something wrnt wrong'
+            'message' : 'Something went wrong'
         })
     
 
