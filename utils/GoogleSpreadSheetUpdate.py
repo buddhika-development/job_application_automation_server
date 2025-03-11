@@ -22,7 +22,7 @@ def check_worksheet_existance() -> object :
         sheet = WORKBOOK.worksheet(worksheet_name)
     else :
         # create sheet for updates
-        sheet = WORKBOOK.add_worksheet(worksheet_name)
+        sheet = WORKBOOK.add_worksheet(worksheet_name, rows=100, cols=10)
 
     return sheet
 

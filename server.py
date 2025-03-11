@@ -17,7 +17,7 @@ def cv_process() :
 
         # update details in google spreadsheet
         try :
-            google_sheet_data_update_status = update_google_spread_sheet(applicant_name, applicant_email, apllicant_contact, applicant_education, applicant_qualification, applicant_qualification)
+            google_sheet_data_update_status = update_google_spread_sheet(applicant_name, applicant_email, apllicant_contact, applicant_education, applicant_qualification, applicant_projects)
 
             if google_sheet_data_update_status == False :
                 return jsonify({
